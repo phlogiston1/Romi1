@@ -21,6 +21,11 @@ public class LineMath {
         return bisectorEquation;
     }
 
+    public static double distanceBetween(Point2d p1, Point2d p2){
+        //sqrt((x2-x1)^2 + (y2 - y1)^2)
+        return Math.sqrt((p2.getX() - p1.getX())*(p2.getX() - p1.getX()) + (p2.getY() - p1.getY())*(p2.getY() - p1.getY()));
+    }
+
     public static Point2d getIntersectionOfLines(Line l1, Line l2){
         LineEquation l1eq = l1.getEquation();
         LineEquation l2eq = l2.getEquation();
@@ -29,6 +34,10 @@ public class LineMath {
         double x = eq / xm;
         double y = l1eq.calc(x);
         return new Point2d(x,y);
+    }
+
+    public static Rotation2d angleBetween(Line l1, Line l2){
+        return l1.getAngleOfInclination().minus(l2.getAngleOfInclination());
     }
     
     public static void main(String args[]){
@@ -41,7 +50,8 @@ public class LineMath {
         ln2.x1 = 0;
         ln2.y1 = 0;
         ln2.x2 = 1;
-        ln2.y2 = 0.5;
+        ln2.y2 = 1;
+        System.out.println(angleBetween(ln, ln2).toString());
         Line test = Line.fromPose(new Pose2d(10,10,Rotation2d.fromDegrees(91)));
         Line test2 = Line.fromEquation(getBisectorOfPoints(new Point2d(10,10), new Point2d(12,12)));
         test.getEquation().print();
@@ -64,6 +74,12 @@ public class LineMath {
             double offset = y1 - eq.calc(x1);
             eq.offset = offset;
             return eq;
+        }
+        public Rotation2d getAngleOfInclination(){
+            LineEquation eq = getEquation();
+            double slope = eq.slope;
+            double inc = Math.atan(slope);
+            return new Rotation2d(inc);
         }
         public void assign(double X1, double Y1, double X2, double Y2){
             x1 = X1;
