@@ -13,5 +13,16 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public static double DIST_BETWEEN_WHEELS = 6; //todo
+    public static final class Drivetrain {
+        public static final double  DIST_BETWEEN_WHEELS = 5.5,
+                                    DRIVETRAIN_KS       = 0,
+                                    DRIVETRAIN_KV       = 0.03,
+                                    DRIVETRAIN_KA       = 1,
+                                    DRIVETRAIN_VEL_KP   = 0.03,
+                                    DRIVETRAIN_VEL_KI   = 0.02,
+                                    DRIVETRAIN_VEL_KD   = 0,
+                                    DRIVETRAIN_POS_KP   = 0, //TODO
+                                    DRIVETRAIN_POS_KI   = 0, //TODO
+                                    DRIVETRAIN_POS_KD   = 0; //TODO
+    }
 }
