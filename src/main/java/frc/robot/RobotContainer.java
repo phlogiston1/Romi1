@@ -13,6 +13,7 @@ import frc.lib.math.Point2d;
 import frc.robot.auto.DriveToPoint;
 import frc.robot.auto.TestAuto;
 import frc.robot.commands.ArcadeDrive;
+import frc.robot.commands.ChezzyDrive;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.RomiDrivetrain;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -35,7 +36,7 @@ public class RobotContainer {
 
   private static RobotContainer instance;
 
-  private final ArcadeDrive driveCommand = new ArcadeDrive(m_romiDrivetrain, driveJoy);
+  private final ChezzyDrive driveCommand = new ChezzyDrive(m_romiDrivetrain, driveJoy);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {

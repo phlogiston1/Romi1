@@ -8,7 +8,7 @@ import frc.lib.math.LineMath;
 import frc.lib.math.Point2d;
 import frc.lib.math.Ratio;
 import frc.lib.math.LineMath.Line;
-import frc.robot.Constants;
+import static frc.robot.Constants.Drivetrain.DIST_BETWEEN_WHEELS;
 
 public class InverseKinematics {
     public static Ratio get(Pose2d location, Point2d goTo){
@@ -37,8 +37,8 @@ public class InverseKinematics {
         double baseRad = LineMath.distanceBetween(Point2d.fromPose(location), rotateAround);
         // System.out.println(baseRad);
 
-        double lRad = baseRad + (Constants.DIST_BETWEEN_WHEELS/2);
-        double rRad = baseRad - (Constants.DIST_BETWEEN_WHEELS/2);
+        double lRad = baseRad + (DIST_BETWEEN_WHEELS/2);
+        double rRad = baseRad - (DIST_BETWEEN_WHEELS/2);
 
         //calculate wheel distances:
         double lCirc = lRad * Math.PI;
