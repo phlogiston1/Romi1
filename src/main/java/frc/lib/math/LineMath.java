@@ -40,6 +40,7 @@ public class LineMath {
         return l1.getAngleOfInclination().minus(l2.getAngleOfInclination());
     }
     
+    //testing:
     public static void main(String args[]){
         Line ln = new Line();
         ln.x1 = 0;

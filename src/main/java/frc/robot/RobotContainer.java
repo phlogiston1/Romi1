@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.lib.math.Point2d;
 import frc.robot.auto.DriveToPoint;
+import frc.robot.auto.TestAuto;
 import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.RomiDrivetrain;
@@ -80,7 +81,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return new DriveToPoint(m_romiDrivetrain, new Point2d(0,0));
+    return new TestAuto(m_romiDrivetrain, new Point2d(12,5));
   }
 
   public Command getDriveCommand(){

@@ -7,6 +7,8 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,24 +30,58 @@ public class RomiDrivetrain extends SubsystemBase {
   private final Encoder m_leftEncoder = new Encoder(4, 5);
   private final Encoder m_rightEncoder = new Encoder(6, 7);
 
+private SimpleMotorFeedforward leftFeedforward = new SimpleMotorFeedforward(0,0.03,1);
+private SimpleMotorFeedforward rightFeedforward = new SimpleMotorFeedforward(0,0.03,1);
+  PIDController lPidController = new PIDController(0,0,0);
+  PIDController rPidController = new PIDController(0,0,0);
+
   /** Creates a new RomiDrivetrain. */
   public RomiDrivetrain() {
     // Use inches as unit for encoder distances
     m_leftEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
     m_rightEncoder.setDistancePerPulse((Math.PI * kWheelDiameterInch) / kCountsPerRevolution);
+    m_leftMotor.enableDeadbandElimination(true);
+    m_rightMotor.enableDeadbandElimination(true);
     resetEncoders();
-    SmartDashboard.putNumber("kp", 0.3);
+    SmartDashboard.putNumber("ks", 0);
+    SmartDashboard.putNumber("kv", 0.025);
+    SmartDashboard.putNumber("ka", 1);
+    SmartDashboard.putNumber("kp", 0.04);
     SmartDashboard.putNumber("ki", 0);
-    SmartDashboard.putNumber("kd", 0);
+    SmartDashboard.putNumber("kd", 0.0);
   }
-
   public void tankDrive(double leftSpeed, double rightSpeed) {
     m_leftMotor.set(leftSpeed);
     m_rightMotor.set(rightSpeed);
   }
 
   public void arcadeDrive(double speed, double turn) {
-    tankDrive(speed - turn, speed + turn);
+    velocityDrive((speed - turn)*20, (speed + turn)*20);
+    //velocityDrive(speed*20, turn*20);
+  }
+
+  public void velocityDrive(double lSpeed, double rSpeed){
+    double ks = SmartDashboard.getNumber("ks", 0);
+    double kv = SmartDashboard.getNumber("kv", 0.05);
+    double ka = SmartDashboard.getNumber("ka", 0); 
+    double kp = SmartDashboard.getNumber("kp", 0.02);
+    double ki = SmartDashboard.getNumber("ki", 0.05);
+    double kd = SmartDashboard.getNumber("kd", 0.00001);
+    //velocityFeedforward = new SimpleMotorFeedforward(ks, kv, ka);
+    lPidController.setPID(kp,ki,kd);
+    rPidController.setPID(kp, ki, kd);
+
+    double lpid = lPidController.calculate(getLeftVelocity(),lSpeed);
+    double lffd = leftFeedforward.calculate(getLeftVelocity());
+    double rpid = rPidController.calculate(-getRightVelocity(),rSpeed);
+    double rffd = rightFeedforward.calculate(-getRightVelocity());
+
+    SmartDashboard.putNumber("lspeed", lSpeed);
+    SmartDashboard.putNumber("rspeed", rSpeed);
+    SmartDashboard.putNumber("lvel", getLeftVelocity());
+    SmartDashboard.putNumber("rvel", getRightVelocity());
+
+    tankDrive(lpid + lffd, rpid + rffd);
   }
 
   double kP = 0, kI = 0, kD = 0;
@@ -84,6 +120,13 @@ public class RomiDrivetrain extends SubsystemBase {
 
   public double getRightDistanceInch() {
     return m_rightEncoder.getDistance();
+  }
+
+  public double getLeftVelocity(){
+    return m_leftEncoder.getRate();
+  }
+  public double getRightVelocity(){
+    return m_rightEncoder.getRate();
   }
 
   @Override

@@ -28,7 +28,7 @@ public class ArcadeDrive extends CommandBase{
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        m_subsystem.arcadeDrive(applyCurve(m_drivejoy.getX())*(-m_drivejoy.getThrottle()), applyCurve(m_drivejoy.getY())*(-m_drivejoy.getThrottle()));
+        m_subsystem.arcadeDrive(applyCurve(m_drivejoy.getX())*(1-m_drivejoy.getThrottle()), applyCurve(m_drivejoy.getY())*(1-m_drivejoy.getThrottle()));
     }
     public double applyCurve(double val) {
         return val*val*val;
