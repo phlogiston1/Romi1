@@ -10,15 +10,11 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.lib.math.Point2d;
-import frc.robot.auto.DriveToPoint;
 import frc.robot.auto.TestAuto;
-import frc.robot.commands.ArcadeDrive;
 import frc.robot.commands.ChezzyDrive;
-import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.RomiDrivetrain;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -32,7 +28,7 @@ public class RobotContainer {
   private HashMap<String, Subsystem> subsystems = new HashMap<String,Subsystem>();
   private HashMap<String, Command> commands = new HashMap<String, Command>();
   //private RobotState robotState = new RobotState();
-  Joystick driveJoy = new Joystick(0);
+  public Joystick driveJoy = new Joystick(0);
 
   private static RobotContainer instance;
 

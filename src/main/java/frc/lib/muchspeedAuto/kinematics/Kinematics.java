@@ -5,11 +5,13 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.math.Point2d;
 import frc.lib.math.PolarPoint2d;
+import frc.robot.Constants;
 
 public class Kinematics {
     private Pose2d pose;
     private final WheelSpeeds speeds;
     private double prevRotation = 0;
+    private double avgDist = 0;
     public Kinematics(Pose2d startPose, WheelSpeeds wheelSpeeds) {
         pose = startPose;
         speeds = wheelSpeeds;
@@ -24,10 +26,20 @@ public class Kinematics {
         SmartDashboard.putNumber("Y: ",current.getY());
 
         pose = new Pose2d(current.getX(), current.getY(), new Rotation2d(rotation));
+        avgDist += Math.abs(speeds.getAvgDelta());
+    }
+
+    public Rotation2d getDeltaRotaionFromEncoders(double left, double right){
+        double rads = (right - left) / Constants.Drivetrain.DIST_BETWEEN_WHEELS;
+        return new Rotation2d(rads);
     }
 
     public Pose2d getRobotPose(){
         return pose;
+    }
+
+    public double getAvgDistance(){
+        return avgDist;
     }
 
     public void zero(){

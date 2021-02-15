@@ -32,7 +32,7 @@ public class ChezzyDrive extends CommandBase{
     @Override
     public void execute() {
         DriveSignal drv = chezz.cheesyDrive(m_drivejoy.getY(), m_drivejoy.getX(), m_drivejoy.getRawButton(1), false);
-        m_subsystem.velocityDrive(drv.getLeft()*20, -drv.getRight()*20);
+        m_subsystem.velocityDrive(drv.getLeft()*20*(1-m_drivejoy.getThrottle()), -drv.getRight()*20*(1-m_drivejoy.getThrottle()));
     }
     public double applyCurve(double val) {
         return val*val*val;
