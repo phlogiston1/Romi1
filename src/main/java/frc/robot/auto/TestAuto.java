@@ -50,27 +50,6 @@ public class TestAuto extends CommandBase{
     points.add(new Point2d(13,13));
     points.add(new Point2d(14,14));
     points.add(new Point2d(15,15));
-    points.add(new Point2d(16,16));
-    points.add(new Point2d(17,17));
-    points.add(new Point2d(18,18));
-    points.add(new Point2d(19,19));
-    points.add(new Point2d(20,20));
-    points.add(new Point2d(21,21));
-    points.add(new Point2d(22,22));
-    points.add(new Point2d(23,23));
-    points.add(new Point2d(24,24));
-    points.add(new Point2d(25,25));
-    points.add(new Point2d(26,26));
-    points.add(new Point2d(27,27));
-    points.add(new Point2d(28,28));
-    points.add(new Point2d(29,29));
-    points.add(new Point2d(30,30));
-    points.add(new Point2d(31,31));
-    points.add(new Point2d(32,32));
-    points.add(new Point2d(33,33));
-    points.add(new Point2d(34,34));
-    points.add(new Point2d(35,35));
-    points.add(new Point2d(36,36));
 
     for(int i = 0; i < points.size() - 1; i++){
       div += LineMath.distanceBetween(points.get(i), points.get(i+1));

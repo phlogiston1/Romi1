@@ -2,6 +2,8 @@ package frc.lib.muchspeedAuto.kinematics;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.math.Point2d;
 import frc.lib.math.PolarPoint2d;
@@ -12,6 +14,8 @@ public class Kinematics {
     private final WheelSpeeds speeds;
     private double prevRotation = 0;
     private double avgDist = 0;
+
+    private double[] shuffleboardData = {0,0};
     public Kinematics(Pose2d startPose, WheelSpeeds wheelSpeeds) {
         pose = startPose;
         speeds = wheelSpeeds;
@@ -22,8 +26,8 @@ public class Kinematics {
         Point2d current = Point2d.fromPose(pose);
         current.transformBy(changeVector);
 
-        SmartDashboard.putNumber("X: ",current.getX());
-        SmartDashboard.putNumber("Y: ",current.getY());
+        shuffleboardData[0] = current.getX();
+        shuffleboardData[1] = current.getY();
 
         pose = new Pose2d(current.getX(), current.getY(), new Rotation2d(rotation));
         avgDist += Math.abs(speeds.getAvgDelta());
@@ -52,5 +56,10 @@ public class Kinematics {
         PolarPoint2d polarVector = new PolarPoint2d(dist, Rotation2d.fromDegrees(averageRotation));
         prevRotation = rotation;
         return PolarPoint2d.getCartesianPoint(polarVector);
+    }
+
+    public void putShuffleboard(){
+        SmartDashboard.putNumber("Robot Pos X", shuffleboardData[0]);
+        SmartDashboard.putNumber("Robot Pos Y", shuffleboardData[1]);
     }
 }

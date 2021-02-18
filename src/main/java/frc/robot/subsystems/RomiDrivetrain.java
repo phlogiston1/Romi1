@@ -16,6 +16,8 @@ import static frc.robot.Constants.Drivetrain.*;
 public class RomiDrivetrain extends SubsystemBase {
   private static final double kCountsPerRevolution = 1440.0;
   private static final double kWheelDiameterInch = 2.75591; // 70 mm
+  private static double lDriftAccumulator = 0;
+  private static double rDriftAccumulator = 0;
 
   // The Romi has the left and right motors set to
   // PWM channels 0 and 1 respectively

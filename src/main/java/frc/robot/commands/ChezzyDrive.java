@@ -11,6 +11,7 @@ public class ChezzyDrive extends CommandBase{
     private final RomiDrivetrain m_subsystem;
     private final Joystick m_drivejoy;
     private final CheesyDriveHelper chezz = new CheesyDriveHelper();
+    private final double twistQuickturnAmount = 0.5;
 
     /**
      * Creates a new ExampleCommand.
@@ -32,7 +33,16 @@ public class ChezzyDrive extends CommandBase{
     @Override
     public void execute() {
         DriveSignal drv = chezz.cheesyDrive(m_drivejoy.getY(), m_drivejoy.getX(), m_drivejoy.getRawButton(1), false);
-        m_subsystem.velocityDrive(drv.getLeft()*20*(1-m_drivejoy.getThrottle()), -drv.getRight()*20*(1-m_drivejoy.getThrottle()));
+        double inchesPerSecondCap = 20 * (1 - m_drivejoy.getThrottle());
+        double left = drv.getLeft();
+        left += m_drivejoy.getTwist() * twistQuickturnAmount;
+        left *= inchesPerSecondCap;
+
+        double right = -drv.getRight();
+        right += m_drivejoy.getTwist() * twistQuickturnAmount;
+        right *= inchesPerSecondCap;
+
+        m_subsystem.velocityDrive(left, right);
     }
     public double applyCurve(double val) {
         return val*val*val;
