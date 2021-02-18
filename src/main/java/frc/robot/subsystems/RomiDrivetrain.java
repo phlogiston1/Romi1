@@ -8,7 +8,10 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotState;
 import static frc.robot.Constants.Drivetrain.*;
@@ -28,9 +31,9 @@ public class RomiDrivetrain extends SubsystemBase {
   // to use DIO pins 4/5 and 6/7 for the left and right
   private final Encoder m_leftEncoder = new Encoder(4, 5);
   private final Encoder m_rightEncoder = new Encoder(6, 7);
-
-private SimpleMotorFeedforward leftFeedforward = new SimpleMotorFeedforward(DRIVETRAIN_KS,DRIVETRAIN_KV,DRIVETRAIN_KA);
-private SimpleMotorFeedforward rightFeedforward = new SimpleMotorFeedforward(DRIVETRAIN_KS,DRIVETRAIN_KV,DRIVETRAIN_KA);
+  public DifferentialDrive dDrive = new DifferentialDrive(m_leftMotor, m_rightMotor); 
+  private SimpleMotorFeedforward leftFeedforward = new SimpleMotorFeedforward(DRIVETRAIN_KS,DRIVETRAIN_KV,DRIVETRAIN_KA);
+  private SimpleMotorFeedforward rightFeedforward = new SimpleMotorFeedforward(DRIVETRAIN_KS,DRIVETRAIN_KV,DRIVETRAIN_KA);
   PIDController lPidController = new PIDController(DRIVETRAIN_VEL_KP, DRIVETRAIN_VEL_KI, DRIVETRAIN_VEL_KD);
   PIDController rPidController = new PIDController(DRIVETRAIN_VEL_KP, DRIVETRAIN_VEL_KI, DRIVETRAIN_VEL_KD);
 
@@ -42,33 +45,18 @@ private SimpleMotorFeedforward rightFeedforward = new SimpleMotorFeedforward(DRI
     m_leftMotor.enableDeadbandElimination(true);
     m_rightMotor.enableDeadbandElimination(true);
     resetEncoders();
-    // SmartDashboard.putNumber("ks", 0);
-    // SmartDashboard.putNumber("kv", 0.025);
-    // SmartDashboard.putNumber("ka", 1);
-    // SmartDashboard.putNumber("kp", 0.04);
-    // SmartDashboard.putNumber("ki", 0);
-    // SmartDashboard.putNumber("kd", 0.0);
   }
   public void tankDrive(double leftSpeed, double rightSpeed) {
     m_leftMotor.set(leftSpeed);
     m_rightMotor.set(rightSpeed);
+    dDrive.feed();
   }
 
   public void arcadeDrive(double speed, double turn) {
     velocityDrive((speed - turn)*20, (speed + turn)*20);
-    //velocityDrive(speed*20, turn*20);
   }
 
   public void velocityDrive(double lSpeed, double rSpeed){
-    // double ks = SmartDashboard.getNumber("ks", 0);
-    // double kv = SmartDashboard.getNumber("kv", 0.05);
-    // double ka = SmartDashboard.getNumber("ka", 0); 
-    // double kp = SmartDashboard.getNumber("kp", 0.02);
-    // double ki = SmartDashboard.getNumber("ki", 0.05);
-    // double kd = SmartDashboard.getNumber("kd", 0.00001);
-    //velocityFeedforward = new SimpleMotorFeedforward(ks, kv, ka);
-    // lPidController.setPID(kp,ki,kd);
-    // rPidController.setPID(kp, ki, kd);
 
     double lpid = lPidController.calculate(getLeftVelocity(),lSpeed);
     double lffd = leftFeedforward.calculate(getLeftVelocity());
@@ -87,9 +75,6 @@ private SimpleMotorFeedforward rightFeedforward = new SimpleMotorFeedforward(DRI
   double li = 0, ri = 0;
   double prevREr = 0, prevLEr = 0;
   public void positionDrive(double leftPosition, double rightPosition){
-    // kP = SmartDashboard.getNumber("kp", 0);
-    // kI = SmartDashboard.getNumber("ki", 0);
-    // kD = SmartDashboard.getNumber("kd", 0);
     double lError = getLeftDistanceInch() - leftPosition;
     double rError = getRightDistanceInch() - rightPosition;
 
@@ -106,6 +91,12 @@ private SimpleMotorFeedforward rightFeedforward = new SimpleMotorFeedforward(DRI
 
     prevLEr = lError;
     prevREr = rError;
+  }
+
+  public void voltageDrive(double lVolts, double rVolts){
+    m_leftMotor.setVoltage(lVolts);
+    m_rightMotor.setVoltage(-rVolts);
+    dDrive.feed();
   }
 
   public void resetEncoders() {
@@ -126,6 +117,10 @@ private SimpleMotorFeedforward rightFeedforward = new SimpleMotorFeedforward(DRI
   }
   public double getRightVelocity(){
     return m_rightEncoder.getRate();
+  }
+
+  public DifferentialDriveWheelSpeeds getWheelSpeeds(){
+    return new DifferentialDriveWheelSpeeds(Units.inchesToMeters(getLeftDistanceInch()), Units.inchesToMeters(getRightDistanceInch()));
   }
 
   @Override

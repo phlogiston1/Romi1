@@ -25,4 +25,18 @@ public final class Constants {
                                     DRIVETRAIN_POS_KI   = 0, //TODO
                                     DRIVETRAIN_POS_KD   = 0; //TODO
     }
+    public static final class Auto{
+        public static final double  TRACK_W_METERS      = 0.142072613,
+                                    KS                  = 0.929,
+                                    KV                  = 6.33,
+                                    KA                  = 0.0389,
+                                    KP                  = 0.085,
+                                    kI                  = 0,
+                                    kD                  = 0,
+                                    MAX_V               = 10,
+                                    MAX_ACCEL           = 0.2,
+                                    MAX_VEL             = 0.5,
+                                    RAMSETE_B           = 2,
+                                    RAMSETE_ZETA        = 0.7;
+    }
 }
