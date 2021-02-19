@@ -32,7 +32,7 @@ public class ChezzyDrive extends CommandBase{
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        DriveSignal drv = chezz.cheesyDrive(m_drivejoy.getY(), m_drivejoy.getX(), m_drivejoy.getRawButton(1), false);
+        DriveSignal drv = chezz.cheesyDrive(m_drivejoy.getY(), -m_drivejoy.getX(), m_drivejoy.getRawButton(1), false);
         double inchesPerSecondCap = 20 * (1 - m_drivejoy.getThrottle());
         double left = drv.getLeft();
         left += m_drivejoy.getTwist() * twistQuickturnAmount;

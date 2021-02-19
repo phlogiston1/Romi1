@@ -16,7 +16,7 @@ public class RobotState {
     private static Joystick drvJoy = RobotContainer.getInstance().driveJoy;
     //private static WheelSpeeds speds = new WheelSpeeds(dt);
     public static DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Constants.Auto.TRACK_W_METERS);
-    public static DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(gyro.getAngleZ()));
+    public static DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(-gyro.getAngleZ()));
     //private static Kinematics kin = new Kinematics(new Pose2d(0,0,new Rotation2d(gyro.getAngleZ())), speds);
     //private static NetworkTableEntry distance = Shuffleboard.getTab("Robot State").add("distance traveled", kin.getAvgDistance()).getEntry();
 
@@ -53,6 +53,6 @@ public class RobotState {
     // }
 
     public static Rotation2d getHeading(){
-        return Rotation2d.fromDegrees(gyro.getAngleZ());
+        return Rotation2d.fromDegrees(-gyro.getAngleZ());
     }
 }

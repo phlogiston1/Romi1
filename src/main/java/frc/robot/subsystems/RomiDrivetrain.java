@@ -53,22 +53,22 @@ public class RomiDrivetrain extends SubsystemBase {
   }
 
   public void arcadeDrive(double speed, double turn) {
-    velocityDrive((speed - turn)*20, (speed + turn)*20);
+    velocityDrive((speed - turn)*20,(speed + turn)*20);
   }
 
   public void velocityDrive(double lSpeed, double rSpeed){
 
-    double lpid = lPidController.calculate(getLeftVelocity(),lSpeed);
-    double lffd = leftFeedforward.calculate(getLeftVelocity());
-    double rpid = rPidController.calculate(-getRightVelocity(),rSpeed);
-    double rffd = rightFeedforward.calculate(-getRightVelocity());
+    double lpid = lPidController.calculate(-getLeftVelocity(),lSpeed);
+    double lffd = leftFeedforward.calculate(-getLeftVelocity());
+    double rpid = rPidController.calculate(getRightVelocity(),rSpeed);
+    double rffd = rightFeedforward.calculate(getRightVelocity());
 
     SmartDashboard.putNumber("lspeed", lSpeed);
     SmartDashboard.putNumber("rspeed", rSpeed);
     SmartDashboard.putNumber("lvel", getLeftVelocity());
     SmartDashboard.putNumber("rvel", getRightVelocity());
 
-    tankDrive(lpid + lffd, rpid + rffd);
+    tankDrive(-(lpid + lffd), -(rpid + rffd));
   }
 
   double kP = DRIVETRAIN_POS_KP, kI = DRIVETRAIN_POS_KI, kD = DRIVETRAIN_POS_KD;

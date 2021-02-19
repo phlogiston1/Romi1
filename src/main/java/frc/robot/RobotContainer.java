@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.lib.math.Point2d;
 import frc.robot.commands.ChezzyDrive;
+import frc.robot.commands.auto.paths.AutoPath;
 import frc.robot.commands.auto.paths.PathBase;
 import frc.robot.commands.auto.paths.TestPath;
 import frc.robot.subsystems.RomiDrivetrain;
@@ -87,7 +88,7 @@ public class RobotContainer {
   public PathBase getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
     try {
-      return new TestPath(m_romiDrivetrain);
+      return new AutoPath(m_romiDrivetrain);
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

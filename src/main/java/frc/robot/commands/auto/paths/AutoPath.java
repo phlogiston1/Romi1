@@ -1,3 +1,4 @@
+
 /*----------------------------------------------------------------------------*/
 /* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
@@ -8,22 +9,26 @@
 package frc.robot.commands.auto.paths;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.util.Units;
 import frc.robot.subsystems.RomiDrivetrain;
 
 /**
  * Testing the PathBase framework. just call start on this to drive the path.
  */
-public class TestPath extends PathBase {
+public class AutoPath extends PathBase {
     /**
      * creates a new trajectory, and then sets it in the PathBase as the one to
      * follow. Call start on this to drive the path.
@@ -31,18 +36,20 @@ public class TestPath extends PathBase {
      * @param subsystem drive train to pass to PathBase
      * @throws IOException
      */
-    public TestPath(RomiDrivetrain subsystem) throws IOException {
+    public AutoPath(RomiDrivetrain subsystem) throws IOException {
         super(subsystem);
-        Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-            // Start at the origin facing the +X direction
-            new Pose2d(0, 0, new Rotation2d(0)),
-            List.of(
-                new Translation2d(0.5, -0.1)
-            ),
-        new Pose2d(1, 0, Rotation2d.fromDegrees(45)),
-        getTrajectoryConfig());
-        //set the trajectory
-        setTrajectory(exampleTrajectory);
+        String trajectoryJSON = "paths/output/Pathing_0.wpilib.json";
+        Trajectory trajectory = new Trajectory();
+        try {
+            Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+            trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+        } catch (IOException ex) {
+            DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+        }
+
+        setTrajectory(trajectory);
         System.out.println("trajectory ready");
 	}
 }
+
+
