@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
-import static frc.robot.Constants.*;
 
 import frc.lib.muchspeedAuto.RobotPosition;
 import frc.lib.muchspeedAuto.actions.Action;
@@ -42,8 +41,9 @@ public class PathBase extends CommandBase implements Action{
     RomiDrivetrain driveTrain;
     Trajectory trajectory_;
     RobotPosition pos;
-    DifferentialDriveVoltageConstraint autoVoltageConstraint;
+    DifferentialDriveVoltageConstraint VoltageConstraint;
     RamseteCommand ramsete;
+    PathConfig config = new PathConfig();
     public boolean finished = false;
 
     /**
@@ -53,10 +53,14 @@ public class PathBase extends CommandBase implements Action{
     public PathBase(RomiDrivetrain subsystem, RobotPosition position) {
         driveTrain = subsystem;
         pos = position;
-        autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
-                new SimpleMotorFeedforward(Auto.KS, Auto.KV, Auto.KA), pos.getKinematics(),
-                Auto.MAX_V); //update
-        //setVoltageConstraint(Auto.MAX_V); //set the initial voltage constraint.
+        VoltageConstraint = new DifferentialDriveVoltageConstraint(
+                new SimpleMotorFeedforward(config.KS, config.KV, config.KA), pos.getKinematics(),
+                config.MAX_V); //update
+        //setVoltageConstraint(.config.MAX_V); //set the initial voltage constraint.
+    }
+
+    public void setConfig(PathConfig conf){
+        config = conf;
     }
 
     /**
@@ -76,8 +80,8 @@ public class PathBase extends CommandBase implements Action{
      * @param voltage the voltage to limit to.
      */
     public void setVoltageConstraint(double voltage) {
-        autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
-                new SimpleMotorFeedforward(Auto.KS, Auto.KV, Auto.KA), pos.getKinematics(),
+        VoltageConstraint = new DifferentialDriveVoltageConstraint(
+                new SimpleMotorFeedforward(config.KS, config.KV, config.KA), pos.getKinematics(),
                 voltage); //update
     }
 
@@ -110,12 +114,12 @@ public class PathBase extends CommandBase implements Action{
      * get the trajectory config of the path. This is needed to manually create a trajectory from a list of poses.
      */
     public TrajectoryConfig getTrajectoryConfig(){
-        return new TrajectoryConfig(Auto.MAX_VEL, Auto.MAX_ACCEL) //update
-        .setKinematics(pos.getKinematics()).addConstraint(autoVoltageConstraint);
+        return new TrajectoryConfig(config.MAX_VEL, config.MAX_ACCEL) //update
+        .setKinematics(pos.getKinematics()).addConstraint(VoltageConstraint);
     }
 
     //get the ramsete command for the path
-   public Command getAutoCommand(){
+   public Command getCommand(){
        return ramsete;
    }
 
@@ -144,14 +148,14 @@ public class PathBase extends CommandBase implements Action{
             pos::getCurrentPose,
             new RamseteController(0, 0),
             new SimpleMotorFeedforward(
-                Auto.KS,
-                Auto.KV,
-                Auto.KA
+                config.KS,
+                config.KV,
+                config.KA
             ),
             pos.getKinematics(),
             pos::getWheelSpeeds,
-            new PIDController(Auto.KP, 0, 0),
-            new PIDController(Auto.KP, 0, 0),
+            new PIDController(config.KP, 0, 0),
+            new PIDController(config.KP, 0, 0),
             driveTrain::voltageDrive, driveTrain
         );
         CommandScheduler.getInstance().schedule(ramsete.andThen(() -> driveTrain.voltageDrive(0,0)));

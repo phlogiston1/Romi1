@@ -10,14 +10,13 @@ import java.util.HashMap;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import frc.lib.math.Point2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.lib.muchspeedAuto.paths.PathBase;
+import frc.lib.romiBase.auto.DefaultPathConfig;
 import frc.lib.romiBase.driveCommands.ChezzyDrive;
 import frc.lib.romiBase.subsystems.RomiDrivetrain;
 import frc.robot.commands.auto.paths.AutoPath;
-import frc.robot.commands.auto.paths.TestPath;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -88,9 +87,10 @@ public class RobotContainer {
   public PathBase getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
     try {
-      return new AutoPath(m_romiDrivetrain, RobotState.getPosition());
+      AutoPath path = new AutoPath(m_romiDrivetrain, RobotState.getPosition());
+      path.setConfig(new DefaultPathConfig());
+      return path;
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     return null;
