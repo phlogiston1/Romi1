@@ -8,7 +8,7 @@ import frc.lib.romiBase.subsystems.RomiDrivetrain;
 
 public class RobotState {
     private static RomiGyro gyro = new RomiGyro();
-    private static RomiDrivetrain dt = (RomiDrivetrain) RobotContainer.getInstance().getSubsystem("drivetrain");
+    private static RomiDrivetrain dt = (RomiDrivetrain) RobotContainer.getInstance().getDrivetrain();
     private static Joystick drvJoy = RobotContainer.getInstance().driveJoy;
     private static RobotPosition rPos = new RobotPosition(dt, gyro, Constants.Auto.TRACK_W_METERS);
 
