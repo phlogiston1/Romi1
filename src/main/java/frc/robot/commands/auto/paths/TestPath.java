@@ -18,7 +18,9 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.util.Units;
-import frc.robot.subsystems.RomiDrivetrain;
+import frc.lib.muchspeedAuto.RobotPosition;
+import frc.lib.muchspeedAuto.paths.PathBase;
+import frc.lib.romiBase.subsystems.RomiDrivetrain;
 
 /**
  * Testing the PathBase framework. just call start on this to drive the path.
@@ -31,8 +33,8 @@ public class TestPath extends PathBase {
      * @param subsystem drive train to pass to PathBase
      * @throws IOException
      */
-    public TestPath(RomiDrivetrain subsystem) throws IOException {
-        super(subsystem);
+    public TestPath(RomiDrivetrain subsystem, RobotPosition pos) throws IOException {
+        super(subsystem, pos);
         Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
             // Start at the origin facing the +X direction
             new Pose2d(0, 0, new Rotation2d(0)),

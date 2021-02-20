@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.auto.actions;
+package frc.lib.muchspeedAuto.actions;
 
 /**
  * Team 254's action interface.

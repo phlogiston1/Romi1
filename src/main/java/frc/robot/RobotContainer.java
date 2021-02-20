@@ -11,11 +11,11 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.lib.math.Point2d;
-import frc.robot.commands.ChezzyDrive;
+import frc.lib.muchspeedAuto.paths.PathBase;
+import frc.lib.romiBase.driveCommands.ChezzyDrive;
+import frc.lib.romiBase.subsystems.RomiDrivetrain;
 import frc.robot.commands.auto.paths.AutoPath;
-import frc.robot.commands.auto.paths.PathBase;
 import frc.robot.commands.auto.paths.TestPath;
-import frc.robot.subsystems.RomiDrivetrain;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
@@ -88,7 +88,7 @@ public class RobotContainer {
   public PathBase getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
     try {
-      return new AutoPath(m_romiDrivetrain);
+      return new AutoPath(m_romiDrivetrain, RobotState.getPosition());
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

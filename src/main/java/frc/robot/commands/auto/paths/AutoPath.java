@@ -23,7 +23,9 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.util.Units;
-import frc.robot.subsystems.RomiDrivetrain;
+import frc.lib.muchspeedAuto.RobotPosition;
+import frc.lib.muchspeedAuto.paths.PathBase;
+import frc.lib.romiBase.subsystems.RomiDrivetrain;
 
 /**
  * Testing the PathBase framework. just call start on this to drive the path.
@@ -36,8 +38,8 @@ public class AutoPath extends PathBase {
      * @param subsystem drive train to pass to PathBase
      * @throws IOException
      */
-    public AutoPath(RomiDrivetrain subsystem) throws IOException {
-        super(subsystem);
+    public AutoPath(RomiDrivetrain subsystem, RobotPosition pos) throws IOException {
+        super(subsystem, pos);
         String trajectoryJSON = "paths/output/Pathing_0.wpilib.json";
         Trajectory trajectory = new Trajectory();
         try {

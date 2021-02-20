@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.robot.commands.auto.paths;
+package frc.lib.muchspeedAuto.paths;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -27,9 +27,11 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import static frc.robot.Constants.*;
+
+import frc.lib.muchspeedAuto.RobotPosition;
+import frc.lib.muchspeedAuto.actions.Action;
+import frc.lib.romiBase.subsystems.RomiDrivetrain;
 import frc.robot.RobotState;
-import frc.robot.commands.auto.actions.Action;
-import frc.robot.subsystems.RomiDrivetrain;
 
 
 /**
@@ -39,9 +41,8 @@ import frc.robot.subsystems.RomiDrivetrain;
 public class PathBase extends CommandBase implements Action{
     RomiDrivetrain driveTrain;
     Trajectory trajectory_;
-    DifferentialDriveVoltageConstraint autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
-                new SimpleMotorFeedforward(Auto.KS, Auto.KV, Auto.KA), RobotState.kinematics,
-                Auto.MAX_V); //update
+    RobotPosition pos;
+    DifferentialDriveVoltageConstraint autoVoltageConstraint;
     RamseteCommand ramsete;
     public boolean finished = false;
 
@@ -49,8 +50,12 @@ public class PathBase extends CommandBase implements Action{
      * create a new PathBase instance.
      * @param subsystem we need to have the drive base for the ramsete command.
      */
-    public PathBase(RomiDrivetrain subsystem) {
+    public PathBase(RomiDrivetrain subsystem, RobotPosition position) {
         driveTrain = subsystem;
+        pos = position;
+        autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
+                new SimpleMotorFeedforward(Auto.KS, Auto.KV, Auto.KA), pos.getKinematics(),
+                Auto.MAX_V); //update
         //setVoltageConstraint(Auto.MAX_V); //set the initial voltage constraint.
     }
 
@@ -62,8 +67,8 @@ public class PathBase extends CommandBase implements Action{
         return this;
     }
     public void init(){
-        RobotState.zeroHeading();
-        RobotState.resetOdometry(new Pose2d(new Translation2d(0,0), new Rotation2d(0)));
+        RobotState.getPosition().zeroHeading();
+        RobotState.getPosition().resetOdometry(new Pose2d(new Translation2d(0,0), new Rotation2d(0)));
     }
 
     /**
@@ -72,7 +77,7 @@ public class PathBase extends CommandBase implements Action{
      */
     public void setVoltageConstraint(double voltage) {
         autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
-                new SimpleMotorFeedforward(Auto.KS, Auto.KV, Auto.KA), RobotState.kinematics,
+                new SimpleMotorFeedforward(Auto.KS, Auto.KV, Auto.KA), pos.getKinematics(),
                 voltage); //update
     }
 
@@ -106,7 +111,7 @@ public class PathBase extends CommandBase implements Action{
      */
     public TrajectoryConfig getTrajectoryConfig(){
         return new TrajectoryConfig(Auto.MAX_VEL, Auto.MAX_ACCEL) //update
-        .setKinematics(RobotState.kinematics).addConstraint(autoVoltageConstraint);
+        .setKinematics(pos.getKinematics()).addConstraint(autoVoltageConstraint);
     }
 
     //get the ramsete command for the path
@@ -136,15 +141,15 @@ public class PathBase extends CommandBase implements Action{
         System.out.println("starting path");
         ramsete = new RamseteCommand(
             trajectory_,
-            RobotState::getCurrentPose,
+            pos::getCurrentPose,
             new RamseteController(0, 0),
             new SimpleMotorFeedforward(
                 Auto.KS,
                 Auto.KV,
                 Auto.KA
             ),
-            RobotState.kinematics,
-            driveTrain::getWheelSpeeds,
+            pos.getKinematics(),
+            pos::getWheelSpeeds,
             new PIDController(Auto.KP, 0, 0),
             new PIDController(Auto.KP, 0, 0),
             driveTrain::voltageDrive, driveTrain

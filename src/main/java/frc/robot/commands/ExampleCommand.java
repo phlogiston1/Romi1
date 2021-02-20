@@ -4,8 +4,8 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.RomiDrivetrain;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.lib.romiBase.subsystems.RomiDrivetrain;
 
 /** An example command that uses an example subsystem. */
 public class ExampleCommand extends CommandBase {
