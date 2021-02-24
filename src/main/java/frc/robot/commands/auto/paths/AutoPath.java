@@ -15,9 +15,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
-import frc.lib.muchspeedAuto.RobotPosition;
-import frc.lib.muchspeedAuto.paths.PathBase;
-import frc.lib.romiBase.subsystems.RomiDrivetrain;
+import frc.robot.subsystems.RomiDrivetrain;
 
 /**
  * Testing the PathBase framework. just call start on this to drive the path.
@@ -30,9 +28,9 @@ public class AutoPath extends PathBase {
      * @param subsystem drive train to pass to PathBase
      * @throws IOException
      */
-    public AutoPath(RomiDrivetrain subsystem, RobotPosition pos) throws IOException {
-        super(subsystem, pos);
-        String trajectoryJSON = "paths/output/Pathing_0.wpilib.json";
+    public AutoPath(RomiDrivetrain subsystem) throws IOException {
+        super(subsystem);
+        String trajectoryJSON = "paths/output/Pathing.wpilib.json";
         Trajectory trajectory = new Trajectory();
         try {
             Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);

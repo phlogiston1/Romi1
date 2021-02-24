@@ -1,10 +1,11 @@
-package frc.lib.romiBase.driveCommands;
+package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.lib.romiBase.subsystems.RomiDrivetrain;
 import frc.lib.util.CheesyDriveHelper;
 import frc.lib.util.DriveSignal;
+import frc.robot.subsystems.RomiDrivetrain;
 
 public class ChezzyDrive extends CommandBase{
     @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
@@ -34,12 +35,13 @@ public class ChezzyDrive extends CommandBase{
     public void execute() {
         DriveSignal drv = chezz.cheesyDrive(m_drivejoy.getY(), -m_drivejoy.getX(), m_drivejoy.getRawButton(1), false);
         double inchesPerSecondCap = 20 * (1 - m_drivejoy.getThrottle());
+        SmartDashboard.putNumber("speed range in/s", inchesPerSecondCap);
         double left = drv.getLeft();
-        left += m_drivejoy.getTwist() * twistQuickturnAmount;
+        left -= m_drivejoy.getTwist() * twistQuickturnAmount;
         left *= inchesPerSecondCap;
 
         double right = -drv.getRight();
-        right += m_drivejoy.getTwist() * twistQuickturnAmount;
+        right -= m_drivejoy.getTwist() * twistQuickturnAmount;
         right *= inchesPerSecondCap;
 
         m_subsystem.velocityDrive(left, right);

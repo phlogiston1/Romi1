@@ -2,15 +2,14 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.lib.romiBase.sensors;
+package frc.robot.sensors;
 
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
-import frc.lib.muchspeedAuto.RobotPosition.Gyro;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
-public class RomiGyro implements Gyro {
+public class RomiGyro {
     private SimDouble m_simRateX;
     private SimDouble m_simRateY;
     private SimDouble m_simRateZ;
@@ -124,7 +123,6 @@ public class RomiGyro implements Gyro {
         }
     }
 
-    @Override
     public Rotation2d getHeading() {
         return Rotation2d.fromDegrees(-getAngleZ());
     }

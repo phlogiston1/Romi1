@@ -5,7 +5,7 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-package frc.lib.muchspeedAuto.paths;
+package frc.robot.commands.auto.paths;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -26,12 +26,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
-
-import frc.lib.muchspeedAuto.RobotPosition;
-import frc.lib.muchspeedAuto.actions.Action;
-import frc.lib.romiBase.subsystems.RomiDrivetrain;
+import frc.robot.Constants;
+import frc.robot.RobotContainer;
 import frc.robot.RobotState;
+import frc.robot.commands.auto.actions.Action;
+import frc.robot.subsystems.RomiDrivetrain;
 
+import static frc.robot.Constants.Auto.*;
 
 /**
  * Code to drive a path. simplifies writing new paths. Just use setTrajectory(trajectory) and then
@@ -40,27 +41,17 @@ import frc.robot.RobotState;
 public class PathBase extends CommandBase implements Action{
     RomiDrivetrain driveTrain;
     Trajectory trajectory_;
-    RobotPosition pos;
-    DifferentialDriveVoltageConstraint VoltageConstraint;
+    DifferentialDriveVoltageConstraint autoVoltageConstraint;
     RamseteCommand ramsete;
-    PathConfig config = new PathConfig();
     public boolean finished = false;
 
     /**
      * create a new PathBase instance.
      * @param subsystem we need to have the drive base for the ramsete command.
      */
-    public PathBase(RomiDrivetrain subsystem, RobotPosition position) {
+    public PathBase(RomiDrivetrain subsystem) {
         driveTrain = subsystem;
-        pos = position;
-        VoltageConstraint = new DifferentialDriveVoltageConstraint(
-                new SimpleMotorFeedforward(config.KS, config.KV, config.KA), pos.getKinematics(),
-                config.MAX_V); //update
-        //setVoltageConstraint(.config.MAX_V); //set the initial voltage constraint.
-    }
-
-    public void setConfig(PathConfig conf){
-        config = conf;
+        setVoltageConstraint(MAX_V); //set the initial voltage constraint.
     }
 
     /**
@@ -71,8 +62,9 @@ public class PathBase extends CommandBase implements Action{
         return this;
     }
     public void init(){
-        RobotState.getPosition().zeroHeading();
-        RobotState.getPosition().resetOdometry(new Pose2d(new Translation2d(0,0), new Rotation2d(0)));
+        //RobotState.zeroHeading();
+        //RobotState.resetOdometry(new Pose2d(new Translation2d(0,0), new Rotation2d(0)));
+        //RobotState.setOdometryStart();
     }
 
     /**
@@ -80,9 +72,9 @@ public class PathBase extends CommandBase implements Action{
      * @param voltage the voltage to limit to.
      */
     public void setVoltageConstraint(double voltage) {
-        VoltageConstraint = new DifferentialDriveVoltageConstraint(
-                new SimpleMotorFeedforward(config.KS, config.KV, config.KA), pos.getKinematics(),
-                voltage); //update
+        autoVoltageConstraint = new DifferentialDriveVoltageConstraint(
+                new SimpleMotorFeedforward(KS, KV, KA), RobotState.kinematics,
+                MAX_V);
     }
 
     /**
@@ -114,12 +106,12 @@ public class PathBase extends CommandBase implements Action{
      * get the trajectory config of the path. This is needed to manually create a trajectory from a list of poses.
      */
     public TrajectoryConfig getTrajectoryConfig(){
-        return new TrajectoryConfig(config.MAX_VEL, config.MAX_ACCEL) //update
-        .setKinematics(pos.getKinematics()).addConstraint(VoltageConstraint);
+        return new TrajectoryConfig(MAX_VEL, MAX_ACCEL)
+        .setKinematics(RobotState.kinematics).addConstraint(autoVoltageConstraint);
     }
 
     //get the ramsete command for the path
-   public Command getCommand(){
+   public Command getAutoCommand(){
        return ramsete;
    }
 
@@ -142,20 +134,21 @@ public class PathBase extends CommandBase implements Action{
      */
     @Override
     public void start() {
+        RobotState.setOdometryStart(trajectory_.getInitialPose());
         System.out.println("starting path");
         ramsete = new RamseteCommand(
             trajectory_,
-            pos::getCurrentPose,
+            RobotState::getCurrentPose,
             new RamseteController(0, 0),
             new SimpleMotorFeedforward(
-                config.KS,
-                config.KV,
-                config.KA
+                KS,
+                KV,
+                KA
             ),
-            pos.getKinematics(),
-            pos::getWheelSpeeds,
-            new PIDController(config.KP, 0, 0),
-            new PIDController(config.KP, 0, 0),
+            RobotState.kinematics,
+            driveTrain::getWheelSpeeds,
+            new PIDController(KP, 0, 0),
+            new PIDController(KP, 0, 0),
             driveTrain::voltageDrive, driveTrain
         );
         CommandScheduler.getInstance().schedule(ramsete.andThen(() -> driveTrain.voltageDrive(0,0)));

@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.lib.romiBase.subsystems;
+package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
@@ -13,13 +13,14 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.lib.muchspeedAuto.AutoDrivetrain;
 import frc.robot.RobotState;
 import static frc.robot.Constants.Drivetrain.*;
 
-public class RomiDrivetrain extends SubsystemBase implements AutoDrivetrain {
+public class RomiDrivetrain extends SubsystemBase {
   private static final double kCountsPerRevolution = 1440.0;
   private static final double kWheelDiameterInch = 2.75591; // 70 mm
+
+  private double prevLDist = 0, prevRDist = 0;
   // private static double lDriftAccumulator = 0;
   // private static double rDriftAccumulator = 0;
 
@@ -33,11 +34,7 @@ public class RomiDrivetrain extends SubsystemBase implements AutoDrivetrain {
   private final Encoder m_leftEncoder = new Encoder(4, 5);
   private final Encoder m_rightEncoder = new Encoder(6, 7);
   public DifferentialDrive dDrive = new DifferentialDrive(m_leftMotor, m_rightMotor); 
-  private SimpleMotorFeedforward leftFeedforward = new SimpleMotorFeedforward(DRIVETRAIN_KS,DRIVETRAIN_KV,DRIVETRAIN_KA);
-  private SimpleMotorFeedforward rightFeedforward = new SimpleMotorFeedforward(DRIVETRAIN_KS,DRIVETRAIN_KV,DRIVETRAIN_KA);
-  PIDController lPidController = new PIDController(DRIVETRAIN_VEL_KP, DRIVETRAIN_VEL_KI, DRIVETRAIN_VEL_KD);
-  PIDController rPidController = new PIDController(DRIVETRAIN_VEL_KP, DRIVETRAIN_VEL_KI, DRIVETRAIN_VEL_KD);
-
+  
   /** Creates a new RomiDrivetrain. */
   public RomiDrivetrain() {
     // Use inches as unit for encoder distances
@@ -52,22 +49,26 @@ public class RomiDrivetrain extends SubsystemBase implements AutoDrivetrain {
     m_rightMotor.set(rightSpeed);
     dDrive.feed();
   }
-
+  
   public void arcadeDrive(double speed, double turn) {
     velocityDrive((speed - turn)*20,(speed + turn)*20);
   }
-
+  private SimpleMotorFeedforward leftFeedforward = new SimpleMotorFeedforward(DRIVETRAIN_KS,DRIVETRAIN_KV,DRIVETRAIN_KA);
+  private SimpleMotorFeedforward rightFeedforward = new SimpleMotorFeedforward(DRIVETRAIN_KS,DRIVETRAIN_KV,DRIVETRAIN_KA);
+  private PIDController lPidController = new PIDController(DRIVETRAIN_VEL_KP, DRIVETRAIN_VEL_KI, DRIVETRAIN_VEL_KD);
+  private PIDController rPidController = new PIDController(DRIVETRAIN_VEL_KP, DRIVETRAIN_VEL_KI, DRIVETRAIN_VEL_KD);
+  
   public void velocityDrive(double lSpeed, double rSpeed){
-
+    
     double lpid = lPidController.calculate(-getLeftVelocity(),lSpeed);
     double lffd = leftFeedforward.calculate(-getLeftVelocity());
     double rpid = rPidController.calculate(getRightVelocity(),rSpeed);
     double rffd = rightFeedforward.calculate(getRightVelocity());
-
-    SmartDashboard.putNumber("lspeed", lSpeed);
-    SmartDashboard.putNumber("rspeed", rSpeed);
-    SmartDashboard.putNumber("lvel", getLeftVelocity());
-    SmartDashboard.putNumber("rvel", getRightVelocity());
+    
+    SmartDashboard.putNumber("l velocity setpoint", lSpeed);
+    SmartDashboard.putNumber("r velocity setpoint", rSpeed);
+    SmartDashboard.putNumber("l velocity", getLeftVelocity());
+    SmartDashboard.putNumber("r velocity", getRightVelocity());
 
     tankDrive(-(lpid + lffd), -(rpid + rffd));
   }
@@ -105,19 +106,49 @@ public class RomiDrivetrain extends SubsystemBase implements AutoDrivetrain {
     m_rightEncoder.reset();
   }
 
-  public double getLeftDistanceInch() {
+
+  private static final double backlashCorrectionDistance = 0.0075; //meters
+  private double backlashCorrectionCurrentRange = 0;
+  private double backlashCorrectionAccumulator = 0;
+  private boolean backlashDirection = true; //true = val > prev val.
+  private boolean correcting = false;
+  private double correctBacklash(double position, double prevPosition) {
+
+    boolean newBacklashDirection = backlashDirection;
+    if(position != prevPosition) newBacklashDirection = position > prevPosition;
+    SmartDashboard.putBoolean("bd", newBacklashDirection);
+    if(newBacklashDirection != backlashDirection) {
+      correcting = true;
+      backlashCorrectionCurrentRange = 0;
+    }
+    if(backlashCorrectionCurrentRange > backlashCorrectionDistance) correcting = false;
+    SmartDashboard.putBoolean("ct", correcting);
+    if(correcting){
+      backlashCorrectionCurrentRange += Math.abs(position - prevPosition);
+    }
+    backlashDirection = newBacklashDirection;
+    return position - backlashCorrectionCurrentRange;
+  }
+
+  private double getLeftDistanceInch() {
     return m_leftEncoder.getDistance();
   }
 
   public double getLeftDistance(){
-    return Units.inchesToMeters(getLeftDistanceInch());
+    double dist = Units.inchesToMeters(getLeftDistanceInch());
+    double corrected = correctBacklash(dist, prevLDist);
+    prevLDist = dist;
+    return corrected;
   }
 
   public double getRightDistance(){
-    return Units.inchesToMeters(getRightDistanceInch());
+    double dist = Units.inchesToMeters(getRightDistanceInch());
+    double corrected = correctBacklash(dist, prevRDist);
+    prevRDist = dist;
+    return corrected;
   }
 
-  public double getRightDistanceInch() {
+  private double getRightDistanceInch() {
     return m_rightEncoder.getDistance();
   }
 
@@ -129,13 +160,13 @@ public class RomiDrivetrain extends SubsystemBase implements AutoDrivetrain {
   }
 
   public DifferentialDriveWheelSpeeds getWheelSpeeds(){
-    return new DifferentialDriveWheelSpeeds(Units.inchesToMeters(getLeftDistanceInch()), Units.inchesToMeters(getRightDistanceInch()));
+    return new DifferentialDriveWheelSpeeds(Units.inchesToMeters(getLeftDistance()), Units.inchesToMeters(getRightDistance()));
   }
 
   @Override
   public void periodic() {
-    RobotState.update();
-  
+    //SmartDashboard.putNumber("backlash correction factor", correctBacklash(getLeftDistance()));
+    //SmartDashboard.putNumber("w/o correction", getLeftDistance());
     // This method will be called once per scheduler run
   }
 

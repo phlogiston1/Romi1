@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Launch Test",
+      "request": "launch",
+      "mainClass": "frc.lib.math.Test",
+      "projectName": "Romi1"
+    },
+    {
+      "type": "java",
       "name": "Launch Path",
       "request": "launch",
       "mainClass": "frc.lib.muchspeedAuto.path.Path",
